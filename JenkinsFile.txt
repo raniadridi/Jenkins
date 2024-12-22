@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+        // Étape de clonage du code depuis Git
+        stage('Checkout') {
+            steps {
+                echo 'Clonage du dépôt Git...'
+                git url: 'https://github.com/raniadridi/petclinic.git', branch: 'main', credentialsId: 'github-credentials'
+            }
+        }
+
+        // Étape de construction du projet
+        stage('Build') {
+            steps {
+                echo 'Construction du projet...'
+                bat './mvnw.cmd clean package'  // Utiliser mvnw.cmd sur Windows
+            }
+        }
+
+        // Étape de test des fonctionnalités
+        stage('Test') {
+            steps {
+                echo 'Exécution des tests...'
+                bat 'mvnw.cmd test'  // Exécuter les tests avec mvnw.cmd
+            }
+            post {
+                always {
+                    echo 'Publication des résultats des tests...'
+                    junit '**/target/surefire-reports/*.xml'  // Publier les résultats des tests
+                }
+            }
+        }
+
+        // Étape d'analyse de la couverture du code avec JaCoCo
+        stage('Code Coverage') {
+            steps {
+                echo 'Analyse de la couverture de code avec JaCoCo...'
+                bat 'mvnw.cmd jacoco:report'  // Générer le rapport de couverture de code avec JaCoCo
+            }
+        }
+    }
+
+    // Étapes après l'exécution du pipeline
+    post {
+        success {
+            echo 'Le pipeline a été exécuté avec succès !'
+        }
+        failure {
+            echo 'Le pipeline a échoué.'
+        }
+    }
+}
