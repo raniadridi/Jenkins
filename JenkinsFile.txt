@@ -6,7 +6,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Clonage du dépôt Git...'
-                git url: 'https://github.com/raniadridi/petclinic.git', branch: 'main', credentialsId: 'github-credentials'
+                git url: 'https://github.com/raniadridi/Jenkins.git', branch: 'main', credentialsId: 'github-credentials'
             }
         }
 
